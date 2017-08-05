@@ -42,8 +42,25 @@
 #include <QMetaType>
 #include <QMessageBox>
 #include <QDateTime>
+#include <signal.h>
 
 Q_DECLARE_METATYPE( QEForm* )
+
+
+static void unixSignalHandler(int signum) {
+
+    Q_UNUSED(signum);
+
+    //qDebug("DBG: main.cpp::unixSignalHandler(). signal = %s\n", strsignal(signum));
+
+    /*
+     * Make sure your Qt application gracefully quits.
+     * NOTE - purpose for calling qApp->exit(0):
+     *      1. Forces the Qt framework's "main event loop `qApp->exec()`" to quit looping.
+     *      2. Also emits the QCoreApplication::aboutToQuit() signal. This signal is used for cleanup code.
+     */
+    QCoreApplication::exit(0);
+}
 
 // Construction
 QEGui::QEGui(int& argc, char **argv ) : QApplication( argc, argv )
@@ -184,6 +201,13 @@ int QEGui::run()
         settings.setValue( QString( "recentFilePathList%1" ).arg( i ), recentFiles.at( i )->pathList );
         settings.setValue( QString( "recentFileMacroSubstitutions%1" ).arg( i ), recentFiles.at( i )->macroSubstitutions );
         settings.setValue( QString( "recentCustomisationName%1" ).arg( i ), recentFiles.at( i )->customisationName );
+    }
+
+    if (signal(SIGINT, unixSignalHandler) == SIG_ERR) {
+        qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);
+    }
+    if (signal(SIGTERM, unixSignalHandler) == SIG_ERR) {
+        qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);
     }
 
     return ret;

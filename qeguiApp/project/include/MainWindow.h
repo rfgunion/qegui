@@ -50,7 +50,8 @@
 
     #include <mutexKnobData.h>
     #include <mutexKnobDataWrapper.h>
-    #include <caqtdm_lib.h>
+    //#include <caqtdm_lib.h>
+    class caQtDMWidget;
 
 #endif // QE_USE_CAQTDM
 
@@ -224,7 +225,7 @@ private:
     // QE_CAQTDM to be processed by QEGuiApp.pro
     #ifdef QE_USE_CAQTDM
 
-        CaQtDM_Lib *caQtDMLib;
+        caQtDMWidget *caQtDMLib;
 
     #endif // QE_USE_CAQTDM
 

@@ -246,22 +246,28 @@ isEmpty( _QE_CAQTDM ) {
     }
 
     # Add caQtDM source locations
-    INCLUDEPATH += $(QE_CAQTDM)/caQtDM_Lib/src \
-                   $(QE_CAQTDM)/caQtDM_QtControls/src \
-                   $(QWT_INCLUDE_PATH)
+	INCLUDEPATH += $$(QE_CAQTDM)/../alsqt/caQtDMWidget \
+				   $$(QE_CAQTDM)/caQtDM_Lib/src \
+				   $$(QE_CAQTDM)/caQtDM_QtControls/src \
+				   $$(QE_CAQTDM)/caQtDM_Lib/caQtDM_Plugins \
+				   $$(QWT_INCLUDE_PATH)
 
     # Include QtPrintSupport for Qt version 5
     equals( QT_MAJOR_VERSION, 5 ) {
-       INCLUDEPATH += $$(QTINC)/QtPrintSupport
+	   #INCLUDEPATH += $$(QTINC)/QtPrintSupport
+		QT += printsupport
     }
 
     # Reference caQtDM library. Look in installed location if supplied, otherwise, caQtDM project area.
     _QE_CAQTDM_LIB = $$(QE_CAQTDM_LIB)
     isEmpty( _QE_CAQTDM_LIB ) {
-        message( "QE_CAQTDM_LIB is not defined so looking for caQtDM library in $QE_CAQTDM/caQtDM_Lib" )
-        LIBS += -L$(QE_CAQTDM)/caQtDM_Lib -lcaQtDM_Lib
+		#message( "QE_CAQTDM_LIB is not defined so looking for caQtDM library in $QE_CAQTDM/caQtDM_Binaries" )
+		#LIBS += -L$(QE_CAQTDM)/caQtDM_Binaries -lcaQtDM_Lib
+		message( "QE_CAQTDM_LIB is not defined so looking for caQtDM library in $QE_CAQTDM/../alsqt/build_rhel6/release/caQtDMWidget" )
+		LIBS += -L$$(QE_CAQTDM)/../alsqt/build_rhel6/release/caQtDMWidget -lcaQtDMWidget
     } else {
-        LIBS += -L$(QE_CAQTDM_LIB) -lcaQtDM_Lib
+		#LIBS += -L$(QE_CAQTDM_LIB) -lcaQtDM_Lib
+		LIBS += -L$$(QE_CAQTDM_LIB) -lcaQtDMWidget
     }
 
 }

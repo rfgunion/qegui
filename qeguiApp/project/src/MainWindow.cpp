@@ -162,6 +162,12 @@
 #include <aboutDialog.h>
 #include <macroSubstitution.h>
 
+// Added Nov 2016 Bob Gunion
+#ifdef QE_USE_CAQTDM
+# include <loadPlugins.h>
+# include <caQtDMWidget.h>
+#endif
+
 #define DEBUG qDebug () << "MainWindow" << __LINE__ << __FUNCTION__ << "  "
 
 // Before Qt 4.8, the command to start designer is 'designer'.
@@ -198,7 +204,7 @@ MainWindow::MainWindow( QEGui* appIn, QString fileName, QString title, QString c
 
         // psi data acquisition
         mutexKnobData = new MutexKnobData();
-        MutexKnobDataWrapperInit(mutexKnobData);
+        //MutexKnobDataWrapperInit(mutexKnobData);
 
     #endif // QE_USE_CAQTDM
 
@@ -525,7 +531,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         #ifdef QE_USE_CAQTDM
 
             QApplication::sendEvent(caQtDMLib, new QCloseEvent());
-            mutexKnobData->deleteLater();
+            //mutexKnobData->deleteLater();
             caQtDMLib->deleteLater();
 
         #endif // QE_USE_CAQTDM
@@ -1036,7 +1042,9 @@ void MainWindow::startDesignerCore( QString command )
 // so set a timer for 0mS and start it in the signal from that
 void MainWindow::processError( QProcess::ProcessError error )
 {
-    if( error == QProcess::FailedToStart )
+    // June 2017 Bob Gunion: On ALS systems, designer-qt4 crashes rather
+    // than failing to start, so disable this check.
+    //if( error == QProcess::FailedToStart )
     {
         // Do nothing if this was the second attempt using an alternate command
         if( processSecondAttempt )
@@ -1276,7 +1284,16 @@ void MainWindow::loadGuiIntoCurrentWindow( QEForm* gui, bool resize )
     // QE_CAQTDM to be processed by QEGuiApp.pro
     #ifdef QE_USE_CAQTDM
 
-        caQtDMLib= new CaQtDM_Lib(this, "", profile.getMacroSubstitutions(), mutexKnobData, 0, false, gui);
+        // Oct 2016 Bob Gunion: updated ctor call to match current version of caqtdm
+        //caQtDMLib= new CaQtDM_Lib(this, "", profile.getMacroSubstitutions(), mutexKnobData, 0, false, gui);
+        QMap<QString, ControlsInterface *> interfaces;
+        QMap<QString, QString> options;
+        // load the control plugins (must be done after setting the environment)
+        loadPlugins loadplugins;
+        if (!loadplugins.loadAll(interfaces, mutexKnobData, 0, options )) {
+            QMessageBox::critical(this, "Error", "CaQtDM: Could not load any plugin");
+        }
+        caQtDMLib= new caQtDMWidget(this, "", profile.getMacroSubstitutions(), mutexKnobData, interfaces, 0, false, gui, options);
 
     #endif // QE_USE_CAQTDM
 }

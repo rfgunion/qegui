@@ -31,10 +31,12 @@ TEMPLATE_TOP=$(EPICS_BASE)/templates/makeBaseApp/top
 BUNDLE=
 
 #
-QE_FRAMEWORK=$(BUNDLE)/gui/qeframework
+#QE_FRAMEWORK=$(BUNDLE)/gui/qeframework
+QE_FRAMEWORK=/home/als1/acct/rfgunion/Development/epics/qt/qtepics/qeframework
 
 # EPICS_BASE usually appears last so other apps can override stuff:
-EPICS_BASE=$(BUNDLE)/epics/base
+#EPICS_BASE=$(BUNDLE)/epics/base
+EPICS_BASE=/usr/local/epics/R3.14.12/base
 
 
 # end
